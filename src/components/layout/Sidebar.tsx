@@ -10,6 +10,10 @@ import { priceList } from "../../data/xactimate";
 import { useAppStore } from "../../stores/useAppStore";
 import { useRegistrationStore } from "../../stores/useRegistrationStore";
 
+/** Routes served under a different layout (PublicLayout, PortalLayout, SubPortalLayout).
+ *  These open in a new tab so the admin shell is not lost. */
+const EXTERNAL_PATHS = new Set(["/portal", "/estimate", "/storm-check", "/sub"]);
+
 const navSections = [
   {
     label: "",
@@ -172,23 +176,37 @@ export function Sidebar() {
                 {section.label}
               </div>
             )}
-            {section.items.map((item) => (
-              <NavLink
-                key={item.id}
-                to={item.path}
-                end={item.path === "/"}
-                className={({ isActive }) =>
-                  `w-full flex items-center gap-2.5 px-4 py-2 text-sm transition ${
-                    isActive
-                      ? "bg-blue-600 text-white"
-                      : "text-gray-400 hover:bg-gray-800 hover:text-white"
-                  }`
-                }
-              >
-                <item.icon className="w-5 h-5" />
-                <span>{item.label}</span>
-              </NavLink>
-            ))}
+            {section.items.map((item) =>
+              EXTERNAL_PATHS.has(item.path) ? (
+                <a
+                  key={item.id}
+                  href={item.path}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full flex items-center gap-2.5 px-4 py-2 text-sm transition text-gray-400 hover:bg-gray-800 hover:text-white"
+                >
+                  <item.icon className="w-5 h-5" />
+                  <span>{item.label}</span>
+                  <ExternalLink className="w-3 h-3 ml-auto opacity-50" />
+                </a>
+              ) : (
+                <NavLink
+                  key={item.id}
+                  to={item.path}
+                  end={item.path === "/"}
+                  className={({ isActive }) =>
+                    `w-full flex items-center gap-2.5 px-4 py-2 text-sm transition ${
+                      isActive
+                        ? "bg-blue-600 text-white"
+                        : "text-gray-400 hover:bg-gray-800 hover:text-white"
+                    }`
+                  }
+                >
+                  <item.icon className="w-5 h-5" />
+                  <span>{item.label}</span>
+                </NavLink>
+              )
+            )}
           </div>
         ))}
       </nav>

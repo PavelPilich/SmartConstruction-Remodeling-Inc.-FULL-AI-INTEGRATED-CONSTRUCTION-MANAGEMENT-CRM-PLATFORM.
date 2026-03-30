@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Badge, Btn, Modal, SmartSelect } from "../../components/ui";
+import { useAppStore } from "../../stores/useAppStore";
 import {
   ArrowLeft, MapPin, Clock, Wind, CloudHail, AlertTriangle, Zap,
   Navigation, Copy, MessageSquare, Megaphone, Play, Pause,
@@ -118,6 +119,7 @@ const insuranceStats = {
 export default function StormDetailPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const addToast = useAppStore((s) => s.addToast);
   const storm = stormData[id || "storm-1"] || stormData["storm-1"];
 
   const [addresses, setAddresses] = useState<DamageAddress[]>(initialAddresses);
@@ -253,7 +255,7 @@ export default function StormDetailPage() {
             <Building2 className="w-5 h-5 text-blue-600" />Affected Addresses ({filteredAddresses.length})
           </h3>
           <div className="flex items-center gap-2">
-            <Btn size="sm" variant="outline" color="#10b981" onClick={() => {}}>
+            <Btn size="sm" variant="outline" color="#10b981" onClick={() => addToast(`Exported ${filteredAddresses.length} addresses to CRM`, "success")}>
               <Download className="w-3.5 h-3.5 inline mr-1" />Export to CRM
             </Btn>
             <Btn size="sm" color="#3b82f6" onClick={() => setAddAddressOpen(true)}>
@@ -361,7 +363,7 @@ export default function StormDetailPage() {
                 label="Canvasser"
               />
               <div className="flex gap-2 mt-3">
-                <Btn size="sm" variant="outline" color="#6b7280" className="flex-1" onClick={() => {}}>
+                <Btn size="sm" variant="outline" color="#6b7280" className="flex-1" onClick={() => addToast(`Route sheet for ${route.area} (${route.addressCount} stops) sent to printer`, "success")}>
                   <Download className="w-3.5 h-3.5 inline mr-1" />Print Sheet
                 </Btn>
                 <Btn size="sm" variant="outline" color="#8b5cf6" className="flex-1" onClick={() => setScriptOpen(true)}>
@@ -530,7 +532,7 @@ export default function StormDetailPage() {
                 </div>
               </div>
             </div>
-            <Btn variant="outline" color="#10b981" onClick={() => {}}>
+            <Btn variant="outline" color="#10b981" onClick={() => addToast("Insurance claims report generated (PDF)", "success")}>
               <FileText className="w-4 h-4 inline mr-1" />Generate Claims Report
             </Btn>
           </div>

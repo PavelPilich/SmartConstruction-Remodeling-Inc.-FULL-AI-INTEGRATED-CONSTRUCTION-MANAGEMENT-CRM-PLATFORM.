@@ -99,6 +99,14 @@ function RatingStars({ rating }: { rating: number }) {
   const half = rating - full >= 0.5;
   return (
     <div className="flex items-center gap-0.5">
+      <svg width="0" height="0" className="absolute">
+        <defs>
+          <linearGradient id="half">
+            <stop offset="50%" stopColor="#f59e0b" />
+            <stop offset="50%" stopColor="transparent" />
+          </linearGradient>
+        </defs>
+      </svg>
       {Array.from({ length: 5 }).map((_, i) => (
         <Star key={i} className="w-3.5 h-3.5" fill={i < full ? "#f59e0b" : i === full && half ? "url(#half)" : "none"} stroke={i < full || (i === full && half) ? "#f59e0b" : "#d1d5db"} />
       ))}
@@ -241,7 +249,7 @@ export default function CrewsPage() {
               <div>
                 <h3 className="font-semibold text-gray-900">{crew.name}</h3>
                 <p className="text-sm text-gray-500">Lead: {crew.leadName}</p>
-                <p className="text-xs text-gray-400 flex items-center gap-1 mt-0.5"><Mail className="w-3 h-3" />{crew.email}</p>
+                <a href={`mailto:${crew.email}`} onClick={(e) => e.stopPropagation()} className="text-xs text-gray-400 flex items-center gap-1 mt-0.5 hover:text-blue-600 transition"><Mail className="w-3 h-3" />{crew.email}</a>
               </div>
               <div className="flex flex-col items-end gap-1.5">
                 <Badge color={statusColors[crew.status]}>{statusLabels[crew.status]}</Badge>
@@ -274,7 +282,7 @@ export default function CrewsPage() {
             </div>
 
             <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-              <div className="flex items-center gap-1.5 text-xs text-gray-500"><Phone className="w-3.5 h-3.5" /> {crew.phone}</div>
+              <a href={`tel:${crew.phone.replace(/\D/g, "")}`} onClick={(e) => e.stopPropagation()} className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-blue-600 transition"><Phone className="w-3.5 h-3.5" /> {crew.phone}</a>
               <RatingStars rating={crew.rating} />
             </div>
           </div>
@@ -465,11 +473,11 @@ export default function CrewsPage() {
               </div>
               <div className="bg-gray-50 rounded-lg p-3">
                 <div className="text-xs text-gray-500 mb-1">Email</div>
-                <div className="font-medium text-gray-900">{selectedCrew.email}</div>
+                <a href={`mailto:${selectedCrew.email}`} className="font-medium text-blue-600 hover:underline">{selectedCrew.email}</a>
               </div>
               <div className="bg-gray-50 rounded-lg p-3">
                 <div className="text-xs text-gray-500 mb-1">Phone</div>
-                <div className="font-medium text-gray-900">{selectedCrew.phone}</div>
+                <a href={`tel:${selectedCrew.phone.replace(/\D/g, "")}`} className="font-medium text-blue-600 hover:underline">{selectedCrew.phone}</a>
               </div>
               <div className="bg-gray-50 rounded-lg p-3">
                 <div className="text-xs text-gray-500 mb-1">Members</div>

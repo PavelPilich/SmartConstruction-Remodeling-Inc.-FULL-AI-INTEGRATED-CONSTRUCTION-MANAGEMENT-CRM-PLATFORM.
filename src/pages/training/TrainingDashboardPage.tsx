@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   GraduationCap, BookOpen, Clock, CheckCircle2, PlayCircle, Lock,
@@ -86,10 +86,10 @@ export default function TrainingDashboardPage() {
   const [certModal, setCertModal] = useState<Certificate | null>(null);
 
   // subscribe to changes
-  useState(() => {
+  useEffect(() => {
     const unsub = subscribeTraining(() => setTick((t) => t + 1));
     return unsub;
-  });
+  }, []);
 
   const modules = getTrainingModules();
   const certs = getCertificates();

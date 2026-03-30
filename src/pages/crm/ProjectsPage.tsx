@@ -498,14 +498,26 @@ export default function ProjectsPage() {
                   {p.address}
                 </div>
                 <div className="flex items-center gap-4 text-xs text-gray-500">
-                  <span className="flex items-center gap-1">
-                    <Phone className="w-3.5 h-3.5" />
-                    {p.phone}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Mail className="w-3.5 h-3.5" />
-                    {p.email}
-                  </span>
+                  {p.phone && (
+                    <a
+                      href={`tel:${p.phone.replace(/[^\d+]/g, "")}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex items-center gap-1 hover:text-blue-600 transition"
+                    >
+                      <Phone className="w-3.5 h-3.5" />
+                      {p.phone}
+                    </a>
+                  )}
+                  {p.email && (
+                    <a
+                      href={`mailto:${p.email}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex items-center gap-1 hover:text-blue-600 transition"
+                    >
+                      <Mail className="w-3.5 h-3.5" />
+                      {p.email}
+                    </a>
+                  )}
                 </div>
               </div>
 

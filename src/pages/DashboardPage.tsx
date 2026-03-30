@@ -173,7 +173,7 @@ export default function DashboardPage() {
 
       {/* Quick Actions Row */}
       <div className="grid grid-cols-6 gap-3">
-        <button onClick={() => navigate("/estimate")} className="flex items-center gap-3 bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md hover:border-blue-300 transition text-left group">
+        <button onClick={() => window.open("/estimate", "_blank")} className="flex items-center gap-3 bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md hover:border-blue-300 transition text-left group">
           <div className="w-10 h-10 bg-orange-50 rounded-lg flex items-center justify-center group-hover:bg-orange-100 transition">
             <Zap className="w-5 h-5 text-orange-600" />
           </div>
@@ -218,7 +218,7 @@ export default function DashboardPage() {
             <div className="text-xs text-gray-500">Billing & payments</div>
           </div>
         </button>
-        <button onClick={() => navigate("/portal")} className="flex items-center gap-3 bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md hover:border-blue-300 transition text-left group">
+        <button onClick={() => window.open("/portal", "_blank")} className="flex items-center gap-3 bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md hover:border-blue-300 transition text-left group">
           <div className="w-10 h-10 bg-indigo-50 rounded-lg flex items-center justify-center group-hover:bg-indigo-100 transition">
             <ExternalLink className="w-5 h-5 text-indigo-600" />
           </div>
@@ -257,7 +257,7 @@ export default function DashboardPage() {
             <CloudLightning className="w-5 h-5 text-purple-600" />
             <h3 className="font-semibold text-gray-900">Storm Risk Tool — Lead Magnet</h3>
           </div>
-          <Btn size="sm" variant="outline" color="#8b5cf6" onClick={() => navigate("/storm-check")}>
+          <Btn size="sm" variant="outline" color="#8b5cf6" onClick={() => window.open("/storm-check", "_blank")}>
             Open Tool <ExternalLink className="w-3.5 h-3.5 inline ml-1" />
           </Btn>
         </div>

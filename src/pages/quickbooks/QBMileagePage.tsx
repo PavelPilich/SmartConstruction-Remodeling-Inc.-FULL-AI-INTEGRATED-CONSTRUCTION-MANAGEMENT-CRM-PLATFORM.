@@ -1,9 +1,10 @@
 import { useState } from "react";
 import {
   MapPin, Car, DollarSign, Calendar, Plus, Play, Download, RefreshCw,
-  Upload, Navigation, Fuel, Wrench, TrendingUp, Clock,
+  Upload, Navigation, Fuel, Wrench, TrendingUp, Clock, Edit3, Trash2,
 } from "lucide-react";
 import { Badge, Btn, StatCard, Modal, SmartSelect } from "../../components/ui";
+import { useAppStore } from "../../stores/useAppStore";
 
 /* ── Types ── */
 interface Trip {
@@ -87,12 +88,13 @@ export default function QBMileagePage() {
   const [tracking, setTracking] = useState(false);
   const [form, setForm] = useState({ date: "2026-03-30", from: "", to: "", miles: "", purpose: "", vehicle: vehicles[0].name, category: "Job Site" as TripCategory });
   const [vehicleForm, setVehicleForm] = useState({ name: "", odometer: "" });
+  const [editingTrip, setEditingTrip] = useState<Trip | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const addToast = useAppStore((s) => s.addToast);
 
-  const totalMiles = 2847;
-  const businessMiles = trips.filter((t) => t.category !== "Personal").reduce((a, t) => a + t.miles, 0);
-  const personalMiles = trips.filter((t) => t.category === "Personal").reduce((a, t) => a + t.miles, 0);
-  const allBusinessMiles = 2614;
-  const allPersonalMiles = 233;
+  const allBusinessMiles = Math.round(trips.filter((t) => t.category !== "Personal").reduce((a, t) => a + t.miles, 0) * 10) / 10;
+  const allPersonalMiles = Math.round(trips.filter((t) => t.category === "Personal").reduce((a, t) => a + t.miles, 0) * 10) / 10;
+  const totalMiles = Math.round((allBusinessMiles + allPersonalMiles) * 10) / 10;
   const taxDeduction = allBusinessMiles * IRS_RATE;
   const tripsThisMonth = trips.filter((t) => t.date >= "2026-03-01").length;
 
@@ -100,20 +102,42 @@ export default function QBMileagePage() {
 
   const handleLogTrip = () => {
     const miles = parseFloat(form.miles);
-    if (!form.from || !form.to || isNaN(miles) || miles <= 0 || !form.purpose) return;
-    const newTrip: Trip = {
-      id: `t${Date.now()}`,
-      date: form.date,
-      from: form.from,
-      to: form.to,
-      miles,
-      purpose: form.purpose,
-      vehicle: form.vehicle,
-      category: form.category,
-    };
-    setTrips((prev) => [newTrip, ...prev]);
+    if (!form.from || !form.to || isNaN(miles) || miles <= 0 || !form.purpose) {
+      addToast("Please fill in all required fields", "error");
+      return;
+    }
+    if (editingTrip) {
+      setTrips((prev) => prev.map((t) => t.id === editingTrip.id ? { ...t, date: form.date, from: form.from, to: form.to, miles, purpose: form.purpose, vehicle: form.vehicle, category: form.category } : t));
+      addToast("Trip updated successfully", "success");
+      setEditingTrip(null);
+    } else {
+      const newTrip: Trip = {
+        id: `t${Date.now()}`,
+        date: form.date,
+        from: form.from,
+        to: form.to,
+        miles,
+        purpose: form.purpose,
+        vehicle: form.vehicle,
+        category: form.category,
+      };
+      setTrips((prev) => [newTrip, ...prev]);
+      addToast(`Trip logged: ${miles} miles`, "success");
+    }
     setForm({ date: "2026-03-30", from: "", to: "", miles: "", purpose: "", vehicle: vehicles[0].name, category: "Job Site" });
     setLogOpen(false);
+  };
+
+  const openEditTrip = (trip: Trip) => {
+    setEditingTrip(trip);
+    setForm({ date: trip.date, from: trip.from, to: trip.to, miles: String(trip.miles), purpose: trip.purpose, vehicle: trip.vehicle, category: trip.category });
+    setLogOpen(true);
+  };
+
+  const handleDeleteTrip = (id: string) => {
+    setTrips((prev) => prev.filter((t) => t.id !== id));
+    setDeleteConfirm(null);
+    addToast("Trip deleted", "success");
   };
 
   const handleAddVehicle = () => {
@@ -148,7 +172,7 @@ export default function QBMileagePage() {
   };
 
   const handleSyncQB = () => {
-    alert("Mileage data synced to QuickBooks successfully.");
+    addToast("Mileage data synced to QuickBooks successfully", "success");
   };
 
   const inputCls = "w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500";
@@ -174,7 +198,7 @@ export default function QBMileagePage() {
               <span className="flex items-center gap-1.5"><Play className="w-4 h-4" /> Start GPS Tracking</span>
             </Btn>
           )}
-          <Btn color="#6b7280" variant="outline" onClick={() => alert("GPS import simulated — 5 trips imported.")}>
+          <Btn color="#6b7280" variant="outline" onClick={() => addToast("GPS import simulated — 5 trips imported", "success")}>
             <span className="flex items-center gap-1.5"><Upload className="w-4 h-4" /> Import from GPS</span>
           </Btn>
         </div>
@@ -225,6 +249,7 @@ export default function QBMileagePage() {
                 <th className="text-left px-4 py-3 font-medium text-gray-500">Purpose</th>
                 <th className="text-left px-4 py-3 font-medium text-gray-500">Vehicle</th>
                 <th className="text-left px-4 py-3 font-medium text-gray-500">Category</th>
+                <th className="text-right px-4 py-3 font-medium text-gray-500">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -240,6 +265,16 @@ export default function QBMileagePage() {
                   <td className="px-4 py-3 text-gray-500 text-xs">{trip.vehicle}</td>
                   <td className="px-4 py-3">
                     <Badge color={catColors[trip.category]}>{trip.category}</Badge>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center justify-end gap-1">
+                      <button onClick={() => openEditTrip(trip)} className="p-1.5 rounded-lg hover:bg-gray-100 transition text-gray-500 hover:text-gray-700" title="Edit">
+                        <Edit3 className="w-4 h-4" />
+                      </button>
+                      <button onClick={() => setDeleteConfirm(trip.id)} className="p-1.5 rounded-lg hover:bg-red-50 transition text-gray-400 hover:text-red-600" title="Delete">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -314,7 +349,7 @@ export default function QBMileagePage() {
       </div>
 
       {/* Log Trip Modal */}
-      <Modal open={logOpen} onClose={() => setLogOpen(false)} title="Log Trip">
+      <Modal open={logOpen} onClose={() => { setLogOpen(false); setEditingTrip(null); }} title={editingTrip ? "Edit Trip" : "Log Trip"}>
         <div className="space-y-4">
           <div>
             <label className="text-xs font-medium text-gray-600 block mb-1">Date</label>
@@ -355,8 +390,8 @@ export default function QBMileagePage() {
             placeholder="Select category"
           />
           <div className="flex justify-end gap-2 pt-2">
-            <Btn color="#94a3b8" variant="outline" onClick={() => setLogOpen(false)}>Cancel</Btn>
-            <Btn color="#3b82f6" onClick={handleLogTrip}>Log Trip</Btn>
+            <Btn color="#94a3b8" variant="outline" onClick={() => { setLogOpen(false); setEditingTrip(null); }}>Cancel</Btn>
+            <Btn color="#3b82f6" onClick={handleLogTrip}>{editingTrip ? "Update Trip" : "Log Trip"}</Btn>
           </div>
         </div>
       </Modal>
@@ -375,6 +410,21 @@ export default function QBMileagePage() {
           <div className="flex justify-end gap-2 pt-2">
             <Btn color="#94a3b8" variant="outline" onClick={() => setVehicleOpen(false)}>Cancel</Btn>
             <Btn color="#3b82f6" onClick={handleAddVehicle}>Add Vehicle</Btn>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Delete Trip Confirmation Modal */}
+      <Modal open={!!deleteConfirm} onClose={() => setDeleteConfirm(null)} title="Delete Trip">
+        <div className="space-y-4">
+          <p className="text-sm text-gray-600">
+            Are you sure you want to delete this trip? This action cannot be undone.
+          </p>
+          <div className="flex justify-end gap-2">
+            <Btn color="#94a3b8" variant="outline" onClick={() => setDeleteConfirm(null)}>Cancel</Btn>
+            <Btn color="#ef4444" onClick={() => deleteConfirm && handleDeleteTrip(deleteConfirm)}>
+              <span className="flex items-center gap-1.5"><Trash2 className="w-4 h-4" /> Delete</span>
+            </Btn>
           </div>
         </div>
       </Modal>

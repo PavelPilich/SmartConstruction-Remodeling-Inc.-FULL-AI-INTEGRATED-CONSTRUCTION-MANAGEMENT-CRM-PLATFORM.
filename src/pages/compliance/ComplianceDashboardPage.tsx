@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { Badge, Btn, Modal } from "../../components/ui";
+import { useAppStore } from "../../stores/useAppStore";
 import {
   ShieldAlert, ShieldCheck, AlertTriangle, CheckCircle2, XCircle, Clock,
   Bell, ChevronDown, ChevronUp, FileText, Upload, Download, Printer,
@@ -194,6 +195,7 @@ const ONBOARDING_SALES = [
 /*  Component                                                          */
 /* ------------------------------------------------------------------ */
 export default function ComplianceDashboardPage() {
+  const addToast = useAppStore((s) => s.addToast);
   const [people, setPeople] = useState<PersonCompliance[]>(INITIAL_PEOPLE);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [autoBlock, setAutoBlock] = useState(true);
@@ -339,7 +341,14 @@ export default function ComplianceDashboardPage() {
           <div className="space-y-2">
             {stats.expiredItems.map((item, i) => (
               <div key={i} className="bg-red-100 rounded-lg px-3 py-2 text-sm text-red-900 font-medium flex items-center gap-2">
-                <Ban className="w-4 h-4 text-red-600 flex-shrink-0" /> {item}
+                <Ban className="w-4 h-4 text-red-600 flex-shrink-0" />
+                <span className="flex-1">{item}</span>
+                <button
+                  onClick={() => addToast(`Urgent reminder sent for: ${item}`, "success")}
+                  className="text-xs text-red-700 hover:text-red-900 bg-red-200 hover:bg-red-300 rounded px-2 py-0.5 font-semibold transition flex items-center gap-1 flex-shrink-0"
+                >
+                  <Mail className="w-3 h-3" /> Send Reminder
+                </button>
               </div>
             ))}
           </div>
@@ -357,7 +366,14 @@ export default function ComplianceDashboardPage() {
           <div className="space-y-2">
             {stats.expiringItems.map((item, i) => (
               <div key={i} className="bg-yellow-100 rounded-lg px-3 py-2 text-sm text-yellow-900 font-medium flex items-center gap-2">
-                <Clock className="w-4 h-4 text-yellow-600 flex-shrink-0" /> {item}
+                <Clock className="w-4 h-4 text-yellow-600 flex-shrink-0" />
+                <span className="flex-1">{item}</span>
+                <button
+                  onClick={() => addToast(`Reminder sent for: ${item}`, "success")}
+                  className="text-xs text-yellow-700 hover:text-yellow-900 bg-yellow-200 hover:bg-yellow-300 rounded px-2 py-0.5 font-semibold transition flex items-center gap-1 flex-shrink-0"
+                >
+                  <Mail className="w-3 h-3" /> Send Reminder
+                </button>
               </div>
             ))}
           </div>

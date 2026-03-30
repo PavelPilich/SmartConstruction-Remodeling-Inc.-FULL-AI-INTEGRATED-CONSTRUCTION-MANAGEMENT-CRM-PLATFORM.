@@ -31,6 +31,13 @@ const pageTitles: Record<string, string> = {
   "/admin/positions": "Positions",
   "/training": "Training Center",
   "/training/guide": "Platform Guide",
+  "/compliance": "AI Compliance",
+  "/ai": "AI Tools",
+  "/hiring": "AI Hiring",
+  "/safety/checklist": "Safety Checklists",
+  "/safety/ratings": "Crew Ratings",
+  "/safety/incidents": "Incident Reports",
+  "/settings/backup": "Backup & Data",
 };
 
 /* Map page paths to guide section IDs and training module IDs */
@@ -60,6 +67,13 @@ const pageToGuideSection: Record<string, string> = {
   "/admin/positions": "registration",
   "/settings/integrations": "settings",
   "/settings/admin": "settings",
+  "/settings/backup": "settings",
+  "/compliance": "compliance",
+  "/ai": "ai-tools",
+  "/hiring": "hiring",
+  "/safety/checklist": "safety",
+  "/safety/ratings": "safety",
+  "/safety/incidents": "safety",
 };
 
 const pageToTrainingModule: Record<string, string> = {
@@ -84,6 +98,13 @@ const pageToTrainingModule: Record<string, string> = {
   "/quickbooks/1099": "quickbooks-integration",
   "/quickbooks/tax": "quickbooks-integration",
   "/quickbooks/mileage": "quickbooks-integration",
+  "/compliance": "compliance-safety",
+  "/ai": "ai-tools",
+  "/hiring": "hiring",
+  "/safety/checklist": "safety-compliance",
+  "/safety/ratings": "safety-compliance",
+  "/safety/incidents": "safety-compliance",
+  "/settings/backup": "settings",
 };
 
 export function Header() {
@@ -91,7 +112,7 @@ export function Header() {
   const nav = useNavigate();
   const [helpOpen, setHelpOpen] = useState(false);
 
-  const title = pageTitles[pathname] || (pathname.startsWith("/estimates/") ? "Estimate Detail" : pathname.startsWith("/crm/projects/") ? "Project Detail" : pathname.startsWith("/inspections/") ? "Inspection Detail" : pathname.startsWith("/storm/") ? "Storm Detail" : pathname.startsWith("/contracts/") ? "Contract Detail" : pathname.startsWith("/training/") ? "Training Module" : "Dashboard");
+  const title = pageTitles[pathname] || (pathname.startsWith("/estimates/") ? "Estimate Detail" : pathname.startsWith("/crm/projects/") ? "Project Detail" : pathname.startsWith("/inspections/") ? "Inspection Detail" : pathname.startsWith("/storm/") ? "Storm Detail" : pathname.startsWith("/contracts/") ? "Contract Detail" : pathname.startsWith("/training/") ? "Training Module" : pathname.startsWith("/hiring/") ? "Hiring Position" : pathname.startsWith("/admin/registrations/") ? "Registrant Detail" : "Dashboard");
 
   const guideSection = pageToGuideSection[pathname] || "dashboard";
   const trainingModule = pageToTrainingModule[pathname];

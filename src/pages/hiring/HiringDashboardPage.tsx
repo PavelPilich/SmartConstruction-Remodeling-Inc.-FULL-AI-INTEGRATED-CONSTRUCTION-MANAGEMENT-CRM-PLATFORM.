@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  UserPlus, Briefcase, Users, Star, CalendarCheck, Globe, Facebook, Instagram,
-  Linkedin, ExternalLink, Edit, XCircle, Sparkles, CheckCircle2, Loader2, ChevronRight,
+  UserPlus, Briefcase, Users, Star, CalendarCheck, Globe, ExternalLink, Edit,
+  XCircle, Sparkles, CheckCircle2, Loader2, ChevronRight,
   RotateCcw, Eye,
 } from "lucide-react";
 import { Badge, Btn, StatCard, Modal, SmartSelect, FileUploadSim } from "../../components/ui";

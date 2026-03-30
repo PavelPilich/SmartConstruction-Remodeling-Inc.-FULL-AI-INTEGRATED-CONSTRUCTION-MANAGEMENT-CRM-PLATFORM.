@@ -7,16 +7,17 @@ interface ApiConnection {
   name: string;
   description: string;
   status: "connected" | "active";
+  enabled: boolean;
 }
 
-const connections: ApiConnection[] = [
-  { name: "Xactimate API", description: "Estimate import/export & pricing data", status: "connected" },
-  { name: "XactAnalysis", description: "Claim assignment & workflow management", status: "connected" },
-  { name: "Xactimate Pricing", description: "Real-time material & labor pricing", status: "active" },
-  { name: "Verisk Data", description: "Property data & aerial measurements", status: "connected" },
-  { name: "CRM Bidirectional Sync", description: "Two-way sync with project pipeline", status: "active" },
-  { name: "QuickBooks Sync", description: "Accounting & invoice synchronization", status: "active" },
-  { name: "Client Portal", description: "Homeowner-facing project updates", status: "connected" },
+const initialConnections: ApiConnection[] = [
+  { name: "Xactimate API", description: "Estimate import/export & pricing data", status: "connected", enabled: true },
+  { name: "XactAnalysis", description: "Claim assignment & workflow management", status: "connected", enabled: true },
+  { name: "Xactimate Pricing", description: "Real-time material & labor pricing", status: "active", enabled: true },
+  { name: "Verisk Data", description: "Property data & aerial measurements", status: "connected", enabled: true },
+  { name: "CRM Bidirectional Sync", description: "Two-way sync with project pipeline", status: "active", enabled: true },
+  { name: "QuickBooks Sync", description: "Accounting & invoice synchronization", status: "active", enabled: true },
+  { name: "Client Portal", description: "Homeowner-facing project updates", status: "connected", enabled: true },
 ];
 
 interface SyncRule {
@@ -39,8 +40,17 @@ const initialSyncRules: SyncRule[] = [
 const insurancePartners = ["State Farm", "Allstate", "USAA", "Liberty Mutual", "Farmers", "Nationwide", "Progressive"];
 
 export default function IntegrationPage() {
+  const [connections, setConnections] = useState<ApiConnection[]>(initialConnections);
   const [syncRules, setSyncRules] = useState<SyncRule[]>(initialSyncRules);
   const addToast = useAppStore((s) => s.addToast);
+
+  const toggleConnection = (index: number) => {
+    setConnections((prev) =>
+      prev.map((conn, i) => (i === index ? { ...conn, enabled: !conn.enabled } : conn))
+    );
+    const conn = connections[index];
+    addToast(conn.enabled ? `${conn.name} disconnected` : `${conn.name} connected`);
+  };
 
   const toggleRule = (index: number) => {
     setSyncRules((prev) =>
@@ -75,9 +85,20 @@ export default function IntegrationPage() {
                   <div className="text-sm font-medium text-gray-900">{conn.name}</div>
                   <div className="text-xs text-gray-500">{conn.description}</div>
                 </div>
-                <Badge color={conn.status === "connected" ? "#10b981" : "#3b82f6"}>
-                  <CheckCircle2 className="w-3 h-3" /> {conn.status}
-                </Badge>
+                <div className="flex items-center gap-2">
+                  <Badge color={conn.enabled ? (conn.status === "connected" ? "#10b981" : "#3b82f6") : "#94a3b8"}>
+                    <CheckCircle2 className="w-3 h-3" /> {conn.enabled ? conn.status : "off"}
+                  </Badge>
+                  <div
+                    onClick={() => toggleConnection(i)}
+                    className={`w-8 h-4.5 rounded-full flex items-center transition-colors cursor-pointer ${
+                      conn.enabled ? "bg-green-500 justify-end" : "bg-gray-300 justify-start"
+                    }`}
+                    style={{ padding: "2px", display: "flex", width: "32px", height: "18px" }}
+                  >
+                    <div className="w-3.5 h-3.5 rounded-full bg-white shadow-sm" />
+                  </div>
+                </div>
               </div>
             ))}
           </div>

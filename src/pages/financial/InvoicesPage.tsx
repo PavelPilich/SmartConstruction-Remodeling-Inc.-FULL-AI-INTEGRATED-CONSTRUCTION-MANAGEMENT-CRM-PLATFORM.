@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FileText, DollarSign, AlertCircle, Clock, Plus, Send, Eye, CheckCircle } from "lucide-react";
+import { FileText, DollarSign, AlertCircle, Clock, Plus, Send, Eye, CheckCircle, Search } from "lucide-react";
 import { Badge, Btn, StatCard, Modal } from "../../components/ui";
 import { useAppStore } from "../../stores/useAppStore";
 
@@ -54,9 +54,18 @@ export default function InvoicesPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [viewInvoice, setViewInvoice] = useState<Invoice | null>(null);
   const [form, setForm] = useState({ customer: "", project: "", amount: "", dueDate: "" });
+  const [search, setSearch] = useState("");
   const addToast = useAppStore((s) => s.addToast);
 
-  const filtered = tab === "all" ? invoiceList : invoiceList.filter((i) => i.status === tab);
+  const filtered = (tab === "all" ? invoiceList : invoiceList.filter((i) => i.status === tab)).filter((i) => {
+    if (!search) return true;
+    const s = search.toLowerCase();
+    return (
+      i.invoiceNumber.toLowerCase().includes(s) ||
+      i.customer.toLowerCase().includes(s) ||
+      i.project.toLowerCase().includes(s)
+    );
+  });
 
   const totalOutstanding = invoiceList
     .filter((i) => i.status !== "paid" && i.status !== "draft")
@@ -153,6 +162,17 @@ export default function InvoicesPage() {
             {t.label}
           </button>
         ))}
+      </div>
+
+      {/* Search */}
+      <div className="relative w-full max-w-sm">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <input
+          className="w-full text-sm border border-gray-300 rounded-lg pl-9 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          placeholder="Search invoices..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
       </div>
 
       {/* Table */}

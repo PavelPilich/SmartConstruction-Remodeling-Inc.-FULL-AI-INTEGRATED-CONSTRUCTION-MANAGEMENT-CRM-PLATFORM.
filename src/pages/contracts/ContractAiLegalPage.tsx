@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Badge, Btn } from "../../components/ui";
+import { Badge, Btn, Modal } from "../../components/ui";
 import {
   Shield, AlertTriangle, CheckCircle2, Clock, Bell, Calendar,
   ChevronRight, ExternalLink, Eye, XCircle, RefreshCw,
@@ -88,6 +88,10 @@ export default function ContractAiLegalPage() {
   const [compliance, setCompliance] = useState<ComplianceItem[]>(COMPLIANCE_ITEMS);
   const [lastReviewDate] = useState("2026-03-01");
   const [nextReviewDate] = useState("2027-03-01");
+  const [showScheduleReview, setShowScheduleReview] = useState(false);
+  const [reviewDate, setReviewDate] = useState("");
+  const [reviewNotes, setReviewNotes] = useState("");
+  const [reviewScheduled, setReviewScheduled] = useState(false);
 
   const activeAlerts = alerts.filter((a) => !a.dismissed);
   const dismissedAlerts = alerts.filter((a) => a.dismissed);
@@ -272,7 +276,7 @@ export default function ContractAiLegalPage() {
                 <p className="text-xs text-gray-500">All 6 templates reviewed by Pavel</p>
               </div>
             </div>
-            <Btn variant="outline" color="#7c3aed">
+            <Btn variant="outline" color="#7c3aed" onClick={() => { setShowScheduleReview(true); setReviewScheduled(false); }}>
               <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4" /> Schedule Review</span>
             </Btn>
           </div>
@@ -314,6 +318,64 @@ export default function ContractAiLegalPage() {
           </div>
         </div>
       </div>
+
+      {/* Schedule Review Modal */}
+      <Modal
+        open={showScheduleReview}
+        onClose={() => { setShowScheduleReview(false); setReviewScheduled(false); }}
+        title={reviewScheduled ? "Review Scheduled" : "Schedule Annual Contract Review"}
+      >
+        {!reviewScheduled ? (
+          <div className="space-y-4">
+            <p className="text-sm text-gray-600">
+              Schedule the next annual review of all contract templates. This ensures your templates stay compliant with the latest state and federal regulations.
+            </p>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Review Date</label>
+              <input
+                type="date"
+                value={reviewDate}
+                onChange={(e) => setReviewDate(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Notes (optional)</label>
+              <textarea
+                value={reviewNotes}
+                onChange={(e) => setReviewNotes(e.target.value)}
+                rows={3}
+                placeholder="Any special focus areas or templates to prioritize..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none resize-none"
+              />
+            </div>
+            <div className="bg-purple-50 rounded-lg p-3 text-xs text-purple-700">
+              <strong>Templates to review:</strong> Standard Roof Replacement, Siding Repair Agreement, Full Exterior Restoration, Emergency Repair Authorization, Insurance Supplement Agreement, Custom Template
+            </div>
+            <div className="flex justify-end gap-2">
+              <Btn variant="outline" color="#6b7280" onClick={() => setShowScheduleReview(false)}>Cancel</Btn>
+              <Btn
+                color="#7c3aed"
+                onClick={() => setReviewScheduled(true)}
+                disabled={!reviewDate}
+              >
+                <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4" /> Schedule Review</span>
+              </Btn>
+            </div>
+          </div>
+        ) : (
+          <div className="text-center py-4 space-y-3">
+            <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto">
+              <CheckCircle2 className="w-8 h-8 text-purple-600" />
+            </div>
+            <h3 className="text-lg font-bold text-gray-900">Review Scheduled!</h3>
+            <p className="text-sm text-gray-500">
+              Annual contract review has been scheduled for <strong>{reviewDate}</strong>. A calendar reminder will be sent to the team.
+            </p>
+            <Btn color="#7c3aed" onClick={() => { setShowScheduleReview(false); setReviewScheduled(false); setReviewDate(""); setReviewNotes(""); }}>Done</Btn>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

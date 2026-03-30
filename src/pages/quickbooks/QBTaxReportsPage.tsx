@@ -4,7 +4,8 @@ import {
   Download, Send, RefreshCw, ChevronDown, ChevronUp, Building2, CreditCard,
   Briefcase, Receipt,
 } from "lucide-react";
-import { Badge, Btn, StatCard, Modal } from "../../components/ui";
+import { Badge, Btn, StatCard } from "../../components/ui";
+import { useAppStore } from "../../stores/useAppStore";
 
 /* ── Data ── */
 const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -55,6 +56,7 @@ type Report = "pl" | "balance" | "ar" | "salestax" | "quarterly" | null;
 export default function QBTaxReportsPage() {
   const [activeReport, setActiveReport] = useState<Report>(null);
   const [exportingPdf, setExportingPdf] = useState(false);
+  const addToast = useAppStore((s) => s.addToast);
 
   const totalRevenue = 892400;
   const totalExpenses = 534200;
@@ -66,16 +68,16 @@ export default function QBTaxReportsPage() {
     setExportingPdf(true);
     setTimeout(() => {
       setExportingPdf(false);
-      alert(`${reportName} exported as PDF successfully.`);
+      addToast(`${reportName} exported as PDF successfully`, "success");
     }, 1500);
   };
 
   const handleSendAccountant = (reportName: string) => {
-    alert(`${reportName} sent to accountant via email.`);
+    addToast(`${reportName} sent to accountant via email`, "success");
   };
 
   const handleSyncQB = (reportName: string) => {
-    alert(`${reportName} synced with QuickBooks.`);
+    addToast(`${reportName} synced with QuickBooks`, "success");
   };
 
   const ReportActions = ({ name }: { name: string }) => (

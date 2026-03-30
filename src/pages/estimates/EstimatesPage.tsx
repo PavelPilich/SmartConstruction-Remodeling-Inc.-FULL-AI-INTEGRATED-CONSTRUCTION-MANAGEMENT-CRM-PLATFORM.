@@ -9,17 +9,30 @@ export default function EstimatesPage() {
   const navigate = useNavigate();
   const { estimates, addEstimate } = useAppStore();
   const [searchQ, setSearchQ] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [showNew, setShowNew] = useState(false);
   const [form, setForm] = useState({ customer: "", address: "", project: "", insurance: "" });
   const [projectTypes, setProjectTypes] = useState(["Roof Replace", "Siding + Gutters", "Interior Water", "Storm Damage", "Fire Damage", "Full Exterior"]);
 
-  const filtered = estimates.filter(
-    (e) =>
-      !searchQ ||
-      e.customer.toLowerCase().includes(searchQ.toLowerCase()) ||
-      e.id.toLowerCase().includes(searchQ.toLowerCase()) ||
-      e.project.toLowerCase().includes(searchQ.toLowerCase())
-  );
+  const statusTabs = [
+    { key: "all", label: "All" },
+    { key: "draft", label: "Draft" },
+    { key: "pending", label: "Pending" },
+    { key: "approved", label: "Approved" },
+    { key: "in_progress", label: "In Progress" },
+  ];
+
+  const filtered = estimates.filter((e) => {
+    if (statusFilter !== "all" && e.status !== statusFilter) return false;
+    if (!searchQ) return true;
+    const q = searchQ.toLowerCase();
+    return (
+      e.customer.toLowerCase().includes(q) ||
+      e.id.toLowerCase().includes(q) ||
+      e.project.toLowerCase().includes(q) ||
+      e.address.toLowerCase().includes(q)
+    );
+  });
 
   const handleCreate = () => {
     if (!form.customer || !form.address || !form.project) return;
@@ -54,7 +67,21 @@ export default function EstimatesPage() {
       </div>
       <div className="relative">
         <Search className="w-4 h-4 absolute left-3 top-2.5 text-gray-400" />
-        <input value={searchQ} onChange={(e) => setSearchQ(e.target.value)} placeholder="Search estimates, projects, customers..." className="w-full pl-9 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        <input value={searchQ} onChange={(e) => setSearchQ(e.target.value)} placeholder="Search estimates, projects, customers, addresses..." className="w-full pl-9 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      </div>
+      <div className="flex gap-1">
+        {statusTabs.map((tab) => {
+          const count = tab.key === "all" ? estimates.length : estimates.filter((e) => e.status === tab.key).length;
+          return (
+            <button
+              key={tab.key}
+              onClick={() => setStatusFilter(tab.key)}
+              className={`px-3 py-1.5 text-xs rounded-lg font-medium transition ${statusFilter === tab.key ? "bg-blue-600 text-white" : "bg-white border text-gray-600 hover:bg-gray-50"}`}
+            >
+              {tab.label} ({count})
+            </button>
+          );
+        })}
       </div>
       <div className="bg-white rounded-xl border overflow-hidden">
         <table className="w-full text-sm">
@@ -67,7 +94,7 @@ export default function EstimatesPage() {
           </thead>
           <tbody>
             {filtered.length === 0 && (
-              <tr><td colSpan={9} className="px-4 py-8 text-center text-gray-400 text-sm">{searchQ ? "No estimates match your search." : "No estimates yet. Create one to get started."}</td></tr>
+              <tr><td colSpan={9} className="px-4 py-8 text-center text-gray-400 text-sm">{searchQ || statusFilter !== "all" ? "No estimates match your search or filter." : "No estimates yet. Create one to get started."}</td></tr>
             )}
             {filtered.map((est) => (
               <tr key={est.id} className="border-b hover:bg-blue-50 cursor-pointer" onClick={() => navigate(`/estimates/${est.id}`)}>

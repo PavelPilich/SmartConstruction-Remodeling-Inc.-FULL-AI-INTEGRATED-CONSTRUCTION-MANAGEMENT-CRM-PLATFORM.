@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Badge, Btn, StatCard, Modal, SmartSelect, FileUploadSim } from "../../components/ui";
+import { useAppStore } from "../../stores/useAppStore";
 import {
   Camera, Shield, Calculator, Mic, TrendingUp, Brain, Sparkles,
   CheckCircle2, AlertTriangle, ChevronDown, ChevronUp, Download,
@@ -87,6 +88,7 @@ function PhotoEstimator() {
 /* ------------------------------------------------------------------ */
 
 function InsuranceClaims() {
+  const addToast = useAppStore((s) => s.addToast);
   const [file, setFile] = useState("");
   const [analyzing, setAnalyzing] = useState(false);
   const [result, setResult] = useState(false);
@@ -181,7 +183,7 @@ function InsuranceClaims() {
           )}
 
           <div className="flex gap-2">
-            <Btn color="#22c55e" size="sm" className="flex-1" onClick={() => {}}>
+            <Btn color="#22c55e" size="sm" className="flex-1" onClick={() => addToast("Insurance claim documents downloaded (ZIP)", "success")}>
               <Download className="w-3.5 h-3.5 mr-1 inline" />Download All
             </Btn>
             <Btn color="#22c55e" variant="outline" size="sm" className="flex-1" onClick={() => setSent(true)}>
@@ -201,6 +203,7 @@ function InsuranceClaims() {
 
 function MaterialCalculator() {
   const nav = useNavigate();
+  const addToast = useAppStore((s) => s.addToast);
   const [projectType, setProjectType] = useState("");
   const [sqft, setSqft] = useState("");
   const [grade, setGrade] = useState("");
@@ -297,9 +300,9 @@ function MaterialCalculator() {
             </div>
           </div>
           <div className="grid grid-cols-2 gap-2">
-            <Btn color="#a855f7" size="sm" onClick={() => {}}>Order from ABC Supply</Btn>
-            <Btn color="#a855f7" variant="outline" size="sm" onClick={() => {}}>Order from Menards</Btn>
-            <Btn color="#6b7280" variant="outline" size="sm" onClick={() => {}}>Export CSV</Btn>
+            <Btn color="#a855f7" size="sm" onClick={() => addToast("Order submitted to ABC Supply ($6,587)", "success")}>Order from ABC Supply</Btn>
+            <Btn color="#a855f7" variant="outline" size="sm" onClick={() => addToast("Order submitted to Menards ($6,587)", "success")}>Order from Menards</Btn>
+            <Btn color="#6b7280" variant="outline" size="sm" onClick={() => addToast("Material list exported as CSV", "success")}>Export CSV</Btn>
             <Btn color="#3b82f6" variant="outline" size="sm" onClick={() => nav("/estimates")}>Add to Estimate</Btn>
           </div>
           <button onClick={reset} className="text-xs text-gray-400 hover:text-gray-600 w-full text-center">Reset</button>
@@ -314,6 +317,7 @@ function MaterialCalculator() {
 /* ------------------------------------------------------------------ */
 
 function VoiceAssistant() {
+  const addToast = useAppStore((s) => s.addToast);
   const [recording, setRecording] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const [done, setDone] = useState(false);
@@ -409,9 +413,9 @@ function VoiceAssistant() {
             <Btn color="#f59e0b" size="sm" onClick={() => setAttached(true)}>
               {attached ? "Attached!" : "Attach to Project"}
             </Btn>
-            <Btn color="#f59e0b" variant="outline" size="sm" onClick={() => {}}>Create Change Order</Btn>
-            <Btn color="#a855f7" variant="outline" size="sm" onClick={() => {}}>Order Materials</Btn>
-            <Btn color="#6b7280" variant="outline" size="sm" onClick={() => {}}>Save Note</Btn>
+            <Btn color="#f59e0b" variant="outline" size="sm" onClick={() => addToast("Change order created for Project MN-0247", "success")}>Create Change Order</Btn>
+            <Btn color="#a855f7" variant="outline" size="sm" onClick={() => addToast("3 sheets 7/16 OSB added to material order", "success")}>Order Materials</Btn>
+            <Btn color="#6b7280" variant="outline" size="sm" onClick={() => addToast("Voice note saved to Project MN-0247", "success")}>Save Note</Btn>
           </div>
           <button onClick={() => { setDone(false); setRecording(false); }} className="text-xs text-gray-400 hover:text-gray-600 w-full text-center">
             Record new note

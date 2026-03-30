@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Badge, Btn, Modal, SmartSelect } from "../../components/ui";
 import { useAppStore } from "../../stores/useAppStore";
-import { Plus } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import type { Supplement } from "../../types";
 
 export default function SupplementsPage() {
@@ -11,6 +11,26 @@ export default function SupplementsPage() {
   const [viewSup, setViewSup] = useState<Supplement | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [form, setForm] = useState({ estimate: "", reason: "", items: "", amount: "" });
+  const [searchQ, setSearchQ] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+
+  const statusTabs = [
+    { key: "all", label: "All" },
+    { key: "pending", label: "Pending" },
+    { key: "submitted", label: "Submitted" },
+    { key: "approved", label: "Approved" },
+  ];
+
+  const filteredSupplements = supplements.filter((sup) => {
+    if (statusFilter !== "all" && sup.status !== statusFilter) return false;
+    if (!searchQ) return true;
+    const q = searchQ.toLowerCase();
+    return (
+      sup.id.toLowerCase().includes(q) ||
+      sup.estimate.toLowerCase().includes(q) ||
+      sup.reason.toLowerCase().includes(q)
+    );
+  });
 
   const handleCreate = () => {
     if (!form.estimate || !form.reason || !form.items || !form.amount) return;
@@ -31,15 +51,36 @@ export default function SupplementsPage() {
 
   return (
     <div className="space-y-5">
-      <h2 className="text-2xl font-bold text-gray-900">Supplements</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-gray-900">Supplements</h2>
+        <Btn onClick={() => setShowCreate(true)}><Plus className="w-4 h-4 inline mr-1" />Create New Supplement</Btn>
+      </div>
+      <div className="relative">
+        <Search className="w-4 h-4 absolute left-3 top-2.5 text-gray-400" />
+        <input value={searchQ} onChange={(e) => setSearchQ(e.target.value)} placeholder="Search supplements by ID, estimate, or reason..." className="w-full pl-9 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      </div>
+      <div className="flex gap-1">
+        {statusTabs.map((tab) => {
+          const count = tab.key === "all" ? supplements.length : supplements.filter((s) => s.status === tab.key).length;
+          return (
+            <button
+              key={tab.key}
+              onClick={() => setStatusFilter(tab.key)}
+              className={`px-3 py-1.5 text-xs rounded-lg font-medium transition ${statusFilter === tab.key ? "bg-blue-600 text-white" : "bg-white border text-gray-600 hover:bg-gray-50"}`}
+            >
+              {tab.label} ({count})
+            </button>
+          );
+        })}
+      </div>
       <div className="bg-white rounded-xl border p-5">
         <div className="text-sm text-gray-600 mb-4">
           Supplements are additional items discovered during work that were not visible during the original inspection. They are submitted to insurance for additional coverage.
         </div>
-        {supplements.length === 0 && (
-          <div className="text-center py-6 text-gray-400 text-sm">No supplements yet. Create one below.</div>
+        {filteredSupplements.length === 0 && (
+          <div className="text-center py-6 text-gray-400 text-sm">{searchQ || statusFilter !== "all" ? "No supplements match your search or filter." : "No supplements yet. Create one to get started."}</div>
         )}
-        {supplements.map((sup) => (
+        {filteredSupplements.map((sup) => (
           <div key={sup.id} className={`rounded-xl border-2 p-4 mb-3 ${sup.status === "approved" ? "border-green-200 bg-green-50" : "border-yellow-200 bg-yellow-50"}`}>
             <div className="flex items-center justify-between">
               <div>
@@ -58,7 +99,6 @@ export default function SupplementsPage() {
             </div>
           </div>
         ))}
-        <Btn onClick={() => setShowCreate(true)}><Plus className="w-4 h-4 inline mr-1" />Create New Supplement</Btn>
       </div>
 
       <Modal open={!!viewSup} onClose={() => setViewSup(null)} title={viewSup ? `Supplement ${viewSup.id}` : ""}>

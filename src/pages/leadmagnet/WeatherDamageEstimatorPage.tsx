@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import {
   CloudLightning, MapPin, Shield, Clock, CheckCircle2, AlertTriangle,
-  Phone, Mail, MessageSquare, Star, Share2, Facebook, ArrowRight,
+  Phone, Mail, MessageSquare, Star, Share2, ArrowRight,
   ChevronRight, Home, Droplets, Wind, Eye,
 } from "lucide-react";
 import { Badge, Btn } from "../../components/ui";
@@ -751,7 +751,7 @@ export default function WeatherDamageEstimatorPage() {
               }}
               className="flex items-center gap-2 px-4 py-2.5 bg-blue-700/30 border border-blue-600/30 rounded-xl text-sm text-blue-300 hover:bg-blue-700/50 transition"
             >
-              <Facebook className="w-4 h-4" /> Share on Facebook
+              <Share2 className="w-4 h-4" /> Share on Facebook
             </button>
             <button
               onClick={() => {

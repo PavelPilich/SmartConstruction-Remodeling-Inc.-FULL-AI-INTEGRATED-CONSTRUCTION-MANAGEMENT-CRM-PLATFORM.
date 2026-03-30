@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Building2, MapPin, Phone, Mail, Users, Shield, Bell, RefreshCw, Database, Download, Trash2 } from "lucide-react";
+import { Building2, MapPin, Phone, Mail, Users, Shield, Bell, RefreshCw, Database, Download, Trash2, Pencil, UserMinus } from "lucide-react";
 import { Badge, Btn, Modal, SmartSelect } from "../../components/ui";
 import { useAppStore } from "../../stores/useAppStore";
 
@@ -63,6 +63,11 @@ export default function AdminPage() {
   const [clearCacheOpen, setClearCacheOpen] = useState(false);
   const [inviteForm, setInviteForm] = useState({ name: "", email: "", role: "Project Manager" });
   const [roleOptionsList, setRoleOptionsList] = useState<string[]>(roleOptions.map((r) => r.value));
+  const [editOpen, setEditOpen] = useState(false);
+  const [editIndex, setEditIndex] = useState<number | null>(null);
+  const [editForm, setEditForm] = useState({ name: "", email: "", role: "Project Manager" });
+  const [removeOpen, setRemoveOpen] = useState(false);
+  const [removeIndex, setRemoveIndex] = useState<number | null>(null);
   const addToast = useAppStore((s) => s.addToast);
 
   const handleInvite = () => {
@@ -82,6 +87,33 @@ export default function AdminPage() {
     setInviteForm({ name: "", email: "", role: "Project Manager" });
     setInviteOpen(false);
     addToast(`Invitation sent to ${newMember.email}`);
+  };
+
+  const handleEdit = () => {
+    if (editIndex === null || !editForm.name || !editForm.email) {
+      addToast("Please fill in all fields", "error");
+      return;
+    }
+    const roleOpt = roleOptions.find((r) => r.value === editForm.role);
+    setTeamMembers((prev) =>
+      prev.map((m, i) =>
+        i === editIndex
+          ? { ...m, name: editForm.name, email: editForm.email, role: editForm.role, roleColor: roleOpt?.color ?? m.roleColor }
+          : m
+      )
+    );
+    setEditOpen(false);
+    setEditIndex(null);
+    addToast(`Updated ${editForm.name}`);
+  };
+
+  const handleRemove = () => {
+    if (removeIndex === null) return;
+    const name = teamMembers[removeIndex].name;
+    setTeamMembers((prev) => prev.filter((_, i) => i !== removeIndex));
+    setRemoveOpen(false);
+    setRemoveIndex(null);
+    addToast(`Removed ${name} from team`);
   };
 
   const togglePref = (index: number) => {
@@ -172,6 +204,20 @@ export default function AdminPage() {
                 <Badge color={member.status === "active" ? "#10b981" : "#94a3b8"} sm>
                   {member.status}
                 </Badge>
+                <button
+                  onClick={() => { setEditForm({ name: member.name, email: member.email, role: member.role }); setEditIndex(i); setEditOpen(true); }}
+                  className="p-1 text-gray-400 hover:text-blue-500 transition"
+                  title="Edit member"
+                >
+                  <Pencil className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={() => { setRemoveIndex(i); setRemoveOpen(true); }}
+                  className="p-1 text-gray-400 hover:text-red-500 transition"
+                  title="Remove member"
+                >
+                  <UserMinus className="w-3.5 h-3.5" />
+                </button>
               </div>
             </div>
           ))}
@@ -280,6 +326,47 @@ export default function AdminPage() {
           <div className="flex justify-end gap-2 pt-2">
             <Btn color="#94a3b8" variant="outline" onClick={() => setClearCacheOpen(false)}>Cancel</Btn>
             <Btn color="#ef4444" onClick={() => { setClearCacheOpen(false); addToast("Cache cleared"); }}>Clear Cache</Btn>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Edit Member Modal */}
+      <Modal open={editOpen} onClose={() => setEditOpen(false)} title="Edit Team Member">
+        <div className="space-y-4">
+          <div>
+            <label className="text-xs font-medium text-gray-600 block mb-1">Full Name</label>
+            <input className={inputCls} placeholder="Enter full name" value={editForm.name} onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))} />
+          </div>
+          <div>
+            <label className="text-xs font-medium text-gray-600 block mb-1">Email Address</label>
+            <input className={inputCls} type="email" placeholder="Enter email address" value={editForm.email} onChange={(e) => setEditForm((f) => ({ ...f, email: e.target.value }))} />
+          </div>
+          <div>
+            <SmartSelect
+              label="Role"
+              value={editForm.role}
+              onChange={(v) => setEditForm((f) => ({ ...f, role: v }))}
+              options={roleOptionsList}
+              onAddNew={(v) => setRoleOptionsList((prev) => [...prev, v])}
+              placeholder="Select role..."
+            />
+          </div>
+          <div className="flex justify-end gap-2 pt-2">
+            <Btn color="#94a3b8" variant="outline" onClick={() => setEditOpen(false)}>Cancel</Btn>
+            <Btn color="#3b82f6" onClick={handleEdit}>Save Changes</Btn>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Remove Member Confirmation Modal */}
+      <Modal open={removeOpen} onClose={() => setRemoveOpen(false)} title="Remove Team Member">
+        <div className="space-y-4">
+          <p className="text-sm text-gray-600">
+            Are you sure you want to remove <strong>{removeIndex !== null ? teamMembers[removeIndex]?.name : ""}</strong> from the team?
+          </p>
+          <div className="flex justify-end gap-2 pt-2">
+            <Btn color="#94a3b8" variant="outline" onClick={() => setRemoveOpen(false)}>Cancel</Btn>
+            <Btn color="#ef4444" onClick={handleRemove}>Remove</Btn>
           </div>
         </div>
       </Modal>

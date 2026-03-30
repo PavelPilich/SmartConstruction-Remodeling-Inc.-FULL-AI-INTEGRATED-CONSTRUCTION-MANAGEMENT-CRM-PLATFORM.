@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   FileText, DollarSign, Users, AlertTriangle, CheckCircle, Calendar,
   Download, Send, Eye, ChevronDown, ChevronUp, FileSpreadsheet,
@@ -209,53 +209,53 @@ export default function QB1099Page() {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {subList.map((sub) => (
-                <tr key={sub.id}>
-                  <td colSpan={8} className="p-0">
-                    <div>
-                      <div className="flex items-center hover:bg-gray-50 transition cursor-pointer" onClick={() => setExpanded(expanded === sub.id ? null : sub.id)}>
-                        <td className="px-4 py-3 w-8">
-                          {expanded === sub.id ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
-                        </td>
-                        <td className="px-4 py-3 font-medium text-gray-900 flex-1">{sub.name}</td>
-                        <td className="px-4 py-3 text-gray-600 font-mono text-xs">{sub.einMasked}</td>
-                        <td className="px-4 py-3">
-                          {sub.w9Status === "on_file" ? (
-                            <span className="flex items-center gap-1 text-green-600 text-xs"><CheckCircle className="w-3.5 h-3.5" /> On File</span>
-                          ) : (
-                            <span className="flex items-center gap-1 text-amber-600 text-xs"><AlertTriangle className="w-3.5 h-3.5" /> Missing</span>
-                          )}
-                        </td>
-                        <td className="px-4 py-3 text-right font-medium text-gray-900">{fmt(sub.ytdPayments)}</td>
-                        <td className="px-4 py-3 text-center">{sub.threshold ? "Yes" : "No"}</td>
-                        <td className="px-4 py-3">{statusBadge(sub)}</td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
-                            {sub.status1099 === "not_filed" && sub.w9Status === "on_file" && (
-                              <Btn size="sm" color="#3b82f6" variant="outline" onClick={() => handleGenerate(sub.id)}>Generate</Btn>
-                            )}
-                            {sub.status1099 === "generated" && (
-                              <>
-                                <Btn size="sm" color="#8b5cf6" variant="outline" onClick={() => setPreviewSub(sub)}>
-                                  <span className="flex items-center gap-1"><Eye className="w-3 h-3" /> Preview</span>
-                                </Btn>
-                                <Btn size="sm" color="#10b981" onClick={() => handleSendIRS(sub.id)}>
-                                  <span className="flex items-center gap-1"><Send className="w-3 h-3" /> Send to IRS</span>
-                                </Btn>
-                              </>
-                            )}
-                            {sub.status1099 === "filed" && (
-                              <Btn size="sm" color="#8b5cf6" variant="outline" onClick={() => setPreviewSub(sub)}>
-                                <span className="flex items-center gap-1"><Eye className="w-3 h-3" /> View</span>
-                              </Btn>
-                            )}
-                            {sub.status1099 === "blocked" && (
-                              <Badge color="#ef4444">W-9 Required</Badge>
-                            )}
-                          </div>
-                        </td>
+                <React.Fragment key={sub.id}>
+                  <tr className="hover:bg-gray-50 transition cursor-pointer" onClick={() => setExpanded(expanded === sub.id ? null : sub.id)}>
+                    <td className="px-4 py-3 w-8">
+                      {expanded === sub.id ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
+                    </td>
+                    <td className="px-4 py-3 font-medium text-gray-900">{sub.name}</td>
+                    <td className="px-4 py-3 text-gray-600 font-mono text-xs">{sub.einMasked}</td>
+                    <td className="px-4 py-3">
+                      {sub.w9Status === "on_file" ? (
+                        <span className="flex items-center gap-1 text-green-600 text-xs"><CheckCircle className="w-3.5 h-3.5" /> On File</span>
+                      ) : (
+                        <span className="flex items-center gap-1 text-amber-600 text-xs"><AlertTriangle className="w-3.5 h-3.5" /> Missing</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-right font-medium text-gray-900">{fmt(sub.ytdPayments)}</td>
+                    <td className="px-4 py-3 text-center">{sub.threshold ? "Yes" : "No"}</td>
+                    <td className="px-4 py-3">{statusBadge(sub)}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
+                        {sub.status1099 === "not_filed" && sub.w9Status === "on_file" && (
+                          <Btn size="sm" color="#3b82f6" variant="outline" onClick={() => handleGenerate(sub.id)}>Generate</Btn>
+                        )}
+                        {sub.status1099 === "generated" && (
+                          <>
+                            <Btn size="sm" color="#8b5cf6" variant="outline" onClick={() => setPreviewSub(sub)}>
+                              <span className="flex items-center gap-1"><Eye className="w-3 h-3" /> Preview</span>
+                            </Btn>
+                            <Btn size="sm" color="#10b981" onClick={() => handleSendIRS(sub.id)}>
+                              <span className="flex items-center gap-1"><Send className="w-3 h-3" /> Send to IRS</span>
+                            </Btn>
+                          </>
+                        )}
+                        {sub.status1099 === "filed" && (
+                          <Btn size="sm" color="#8b5cf6" variant="outline" onClick={() => setPreviewSub(sub)}>
+                            <span className="flex items-center gap-1"><Eye className="w-3 h-3" /> View</span>
+                          </Btn>
+                        )}
+                        {sub.status1099 === "blocked" && (
+                          <Badge color="#ef4444">W-9 Required</Badge>
+                        )}
                       </div>
-                      {/* Expanded Payment History */}
-                      {expanded === sub.id && (
+                    </td>
+                  </tr>
+                  {/* Expanded Payment History */}
+                  {expanded === sub.id && (
+                    <tr>
+                      <td colSpan={8} className="p-0">
                         <div className="bg-gray-50 px-8 py-3 border-t border-gray-100">
                           <h4 className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wide">Payment History</h4>
                           <table className="w-full text-xs">
@@ -284,10 +284,10 @@ export default function QB1099Page() {
                             </tbody>
                           </table>
                         </div>
-                      )}
-                    </div>
-                  </td>
-                </tr>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
               ))}
             </tbody>
           </table>

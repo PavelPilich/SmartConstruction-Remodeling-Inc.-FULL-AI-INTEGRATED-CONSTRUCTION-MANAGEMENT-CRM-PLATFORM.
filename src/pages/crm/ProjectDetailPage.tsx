@@ -302,11 +302,19 @@ export default function ProjectDetailPage() {
             </div>
             <div className="flex items-center gap-2">
               <Phone className="w-4 h-4 text-gray-400 shrink-0" />
-              <span className="text-gray-600">{project.phone || "N/A"}</span>
+              {project.phone ? (
+                <a href={`tel:${project.phone.replace(/[^\d+]/g, "")}`} className="text-blue-600 hover:underline">{project.phone}</a>
+              ) : (
+                <span className="text-gray-600">N/A</span>
+              )}
             </div>
             <div className="flex items-center gap-2">
               <Mail className="w-4 h-4 text-gray-400 shrink-0" />
-              <span className="text-gray-600">{project.email || "N/A"}</span>
+              {project.email ? (
+                <a href={`mailto:${project.email}`} className="text-blue-600 hover:underline">{project.email}</a>
+              ) : (
+                <span className="text-gray-600">N/A</span>
+              )}
             </div>
           </div>
         </div>
