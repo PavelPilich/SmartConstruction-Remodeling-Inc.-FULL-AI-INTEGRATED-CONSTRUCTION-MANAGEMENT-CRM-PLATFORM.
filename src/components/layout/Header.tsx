@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { HelpCircle, BookOpen, PlayCircle, X } Menu, } from "lucide-react";
+import { HelpCircle, BookOpen, PlayCircle, X, Menu } from "lucide-react";
 import { Badge } from "../ui/Badge";
 
 const pageTitles: Record<string, string> = {
