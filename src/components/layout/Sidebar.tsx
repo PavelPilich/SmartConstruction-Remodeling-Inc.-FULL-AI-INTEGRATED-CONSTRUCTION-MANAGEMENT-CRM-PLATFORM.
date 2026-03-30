@@ -159,8 +159,8 @@ export function Sidebar() {
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-xs font-black">SC</div>
           <div>
-            <div className="font-bold text-sm">Smart Construction</div>
-            <div className="text-gray-400 text-xs">Business Platform</div>
+            <div className="font-bold text-sm leading-tight">Smart Construction &amp; Remodeling Inc</div>
+            <div className="text-gray-400 text-xs">Full AI-Integrated Platform</div>
           </div>
         </div>
         <div className="flex items-center gap-1.5 mt-3">
