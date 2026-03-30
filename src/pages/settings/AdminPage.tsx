@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Building2, MapPin, Phone, Mail, Users, Shield, Bell, RefreshCw, Database, Download, Trash2, Pencil, UserMinus } from "lucide-react";
+import { Building2, MapPin, Phone, Mail, Users, Shield, Bell, RefreshCw, Database, Download, Trash2, Pencil, UserMinus, Lock, Eye, EyeOff, ChevronDown, ChevronUp } from "lucide-react";
 import { Badge, Btn, Modal, SmartSelect } from "../../components/ui";
 import { useAppStore } from "../../stores/useAppStore";
 
@@ -9,14 +9,60 @@ interface TeamMember {
   role: string;
   roleColor: string;
   status: "active" | "inactive";
+  permissions: Record<string, boolean>;
+}
+
+/* ── All platform sections that can be toggled ── */
+const platformSections = [
+  { group: "CRM", items: [{ id: "projects", label: "Projects" }, { id: "leads", label: "Leads Pipeline" }] },
+  { group: "INSPECTIONS", items: [{ id: "inspections", label: "Drone Inspections" }, { id: "drone-flight", label: "Drone Flight Mgmt" }, { id: "ai-analysis", label: "AI Damage Analysis" }] },
+  { group: "STORM INTEL", items: [{ id: "storm", label: "Storm Center" }, { id: "storm-history", label: "Storm History" }] },
+  { group: "AI TOOLS", items: [{ id: "ai-tools", label: "AI Tools" }] },
+  { group: "ESTIMATES", items: [{ id: "estimates", label: "Estimates" }, { id: "pricelist", label: "Price List" }, { id: "supplements", label: "Supplements" }] },
+  { group: "SCHEDULING", items: [{ id: "calendar", label: "Calendar" }, { id: "crews", label: "Crews" }] },
+  { group: "FINANCIAL", items: [{ id: "invoices", label: "Invoices" }, { id: "reports", label: "Reports" }, { id: "expenses", label: "Job Expenses" }] },
+  { group: "CONTRACTS", items: [{ id: "contracts", label: "Contracts" }, { id: "templates", label: "Templates" }, { id: "legal", label: "AI Legal Monitor" }] },
+  { group: "QUICKBOOKS", items: [{ id: "qb-sync", label: "QB Sync" }, { id: "qb-1099", label: "1099 Tracking" }, { id: "qb-tax", label: "Tax Reports" }, { id: "qb-mileage", label: "Mileage" }] },
+  { group: "REGISTRATION", items: [{ id: "registrations", label: "Registrations" }, { id: "positions", label: "Positions" }] },
+  { group: "CLIENT PORTAL", items: [{ id: "portal", label: "Client Portal" }] },
+  { group: "SALES", items: [{ id: "roofle", label: "Instant Estimates" }, { id: "storm-check", label: "Storm Risk Tool" }] },
+  { group: "HIRING", items: [{ id: "hiring", label: "AI Hiring" }] },
+  { group: "TRAINING", items: [{ id: "training", label: "Training Center" }, { id: "guide", label: "Platform Guide" }] },
+  { group: "SUB PORTAL", items: [{ id: "subportal", label: "Sub Portal" }, { id: "compliance", label: "AI Compliance" }] },
+  { group: "SAFETY", items: [{ id: "safety-checklist", label: "Safety Checklists" }, { id: "ratings", label: "Crew Ratings" }, { id: "incidents", label: "Incident Reports" }] },
+  { group: "SETTINGS", items: [{ id: "integration", label: "Integrations" }, { id: "admin", label: "Admin" }, { id: "backup", label: "Backup & Data" }] },
+];
+
+const allSectionIds = platformSections.flatMap((g) => g.items.map((i) => i.id));
+
+/* Default permissions by role */
+function defaultPermissions(role: string): Record<string, boolean> {
+  const all: Record<string, boolean> = {};
+  allSectionIds.forEach((id) => {
+    all[id] = false;
+  });
+
+  if (role === "Owner / Admin" || role === "Office Manager") {
+    allSectionIds.forEach((id) => { all[id] = true; });
+  } else if (role === "Project Manager") {
+    ["projects", "leads", "inspections", "drone-flight", "ai-analysis", "storm", "storm-history", "estimates", "pricelist", "supplements", "calendar", "crews", "invoices", "reports", "expenses", "contracts", "templates", "portal", "training", "guide", "safety-checklist", "ratings", "incidents", "ai-tools"].forEach((id) => { all[id] = true; });
+  } else if (role === "Estimator") {
+    ["estimates", "pricelist", "supplements", "projects", "inspections", "ai-analysis", "storm", "calendar", "portal", "ai-tools", "training", "guide"].forEach((id) => { all[id] = true; });
+  } else if (role === "Crew Lead") {
+    ["projects", "calendar", "crews", "safety-checklist", "ratings", "incidents", "training", "guide", "inspections"].forEach((id) => { all[id] = true; });
+  } else if (role === "Field Tech") {
+    ["calendar", "crews", "safety-checklist", "training", "guide"].forEach((id) => { all[id] = true; });
+  }
+  // Dashboard always accessible
+  return all;
 }
 
 const initialTeamMembers: TeamMember[] = [
-  { name: "Alex Martinez", email: "alex@smartconstruction.com", role: "Owner / Admin", roleColor: "#ef4444", status: "active" },
-  { name: "Mike Rodriguez", email: "mike@smartconstruction.com", role: "Project Manager", roleColor: "#3b82f6", status: "active" },
-  { name: "Sarah Kim", email: "sarah@smartconstruction.com", role: "Estimator", roleColor: "#8b5cf6", status: "active" },
-  { name: "James Wilson", email: "james@smartconstruction.com", role: "Crew Lead", roleColor: "#f59e0b", status: "active" },
-  { name: "Lisa Chen", email: "lisa@smartconstruction.com", role: "Office Manager", roleColor: "#10b981", status: "inactive" },
+  { name: "Alex Martinez", email: "alex@smartconstruction.com", role: "Owner / Admin", roleColor: "#ef4444", status: "active", permissions: defaultPermissions("Owner / Admin") },
+  { name: "Mike Rodriguez", email: "mike@smartconstruction.com", role: "Project Manager", roleColor: "#3b82f6", status: "active", permissions: defaultPermissions("Project Manager") },
+  { name: "Sarah Kim", email: "sarah@smartconstruction.com", role: "Estimator", roleColor: "#8b5cf6", status: "active", permissions: defaultPermissions("Estimator") },
+  { name: "James Wilson", email: "james@smartconstruction.com", role: "Crew Lead", roleColor: "#f59e0b", status: "active", permissions: defaultPermissions("Crew Lead") },
+  { name: "Lisa Chen", email: "lisa@smartconstruction.com", role: "Office Manager", roleColor: "#10b981", status: "inactive", permissions: defaultPermissions("Office Manager") },
 ];
 
 interface Preference {
@@ -29,7 +75,7 @@ interface Preference {
 const initialPreferences: Preference[] = [
   { label: "Email Notifications", description: "Receive email alerts for new estimates, approvals, and payments", enabled: true, icon: Bell },
   { label: "Push Notifications", description: "Browser push notifications for real-time updates", enabled: true, icon: Bell },
-  { label: "Auto-Sync Estimates", description: "Automatically sync Xactimate estimates on import", enabled: true, icon: RefreshCw },
+  { label: "Auto-Sync Estimates", description: "Automatically sync AI estimates on import", enabled: true, icon: RefreshCw },
   { label: "Auto-Generate Invoices", description: "Create invoices automatically when estimates are approved", enabled: false, icon: Database },
   { label: "Two-Factor Authentication", description: "Require 2FA for all team member logins", enabled: true, icon: Shield },
 ];
@@ -41,6 +87,11 @@ const roleOptions = [
   { value: "Office Manager", color: "#10b981" },
   { value: "Field Tech", color: "#06b6d4" },
 ];
+
+/* Can this role manage permissions? */
+function canManagePermissions(role: string) {
+  return role === "Owner / Admin" || role === "Office Manager";
+}
 
 function Toggle({ enabled, onToggle }: { enabled: boolean; onToggle: () => void }) {
   return (
@@ -68,7 +119,18 @@ export default function AdminPage() {
   const [editForm, setEditForm] = useState({ name: "", email: "", role: "Project Manager" });
   const [removeOpen, setRemoveOpen] = useState(false);
   const [removeIndex, setRemoveIndex] = useState<number | null>(null);
+
+  /* Permissions modal state */
+  const [permOpen, setPermOpen] = useState(false);
+  const [permIndex, setPermIndex] = useState<number | null>(null);
+  const [permDraft, setPermDraft] = useState<Record<string, boolean>>({});
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
+
   const addToast = useAppStore((s) => s.addToast);
+
+  /* Current logged-in user is always the first member (Owner) */
+  const currentUser = teamMembers[0];
+  const hasPermAccess = canManagePermissions(currentUser.role);
 
   const handleInvite = () => {
     if (!inviteForm.name || !inviteForm.email) {
@@ -82,6 +144,7 @@ export default function AdminPage() {
       role: inviteForm.role,
       roleColor: roleOpt?.color ?? "#3b82f6",
       status: "active",
+      permissions: defaultPermissions(inviteForm.role),
     };
     setTeamMembers((prev) => [...prev, newMember]);
     setInviteForm({ name: "", email: "", role: "Project Manager" });
@@ -122,6 +185,45 @@ export default function AdminPage() {
     );
   };
 
+  /* ── Permission handlers ── */
+  const openPermissions = (index: number) => {
+    if (!hasPermAccess) {
+      addToast("Only Owner and Office Manager can manage permissions", "error");
+      return;
+    }
+    setPermIndex(index);
+    setPermDraft({ ...teamMembers[index].permissions });
+    // Expand all groups by default
+    const eg: Record<string, boolean> = {};
+    platformSections.forEach((g) => { eg[g.group] = true; });
+    setExpandedGroups(eg);
+    setPermOpen(true);
+  };
+
+  const togglePermission = (sectionId: string) => {
+    setPermDraft((prev) => ({ ...prev, [sectionId]: !prev[sectionId] }));
+  };
+
+  const toggleGroupAll = (group: typeof platformSections[0]) => {
+    const allEnabled = group.items.every((item) => permDraft[item.id]);
+    const updated = { ...permDraft };
+    group.items.forEach((item) => { updated[item.id] = !allEnabled; });
+    setPermDraft(updated);
+  };
+
+  const savePermissions = () => {
+    if (permIndex === null) return;
+    setTeamMembers((prev) =>
+      prev.map((m, i) => (i === permIndex ? { ...m, permissions: { ...permDraft } } : m))
+    );
+    setPermOpen(false);
+    setPermIndex(null);
+    addToast(`Permissions updated for ${teamMembers[permIndex!].name}`);
+  };
+
+  const countEnabled = (member: TeamMember) =>
+    Object.values(member.permissions).filter(Boolean).length;
+
   const inputCls = "w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500";
 
   return (
@@ -129,7 +231,7 @@ export default function AdminPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Admin Settings</h1>
-        <p className="text-sm text-gray-500 mt-1">Company information, team, and system preferences</p>
+        <p className="text-sm text-gray-500 mt-1">Company information, team, permissions, and system preferences</p>
       </div>
 
       {/* Company Info */}
@@ -141,7 +243,7 @@ export default function AdminPage() {
           <div>
             <label className="text-xs font-medium text-gray-500 block mb-1">Company Name</label>
             <div className="text-sm font-medium text-gray-900 bg-gray-50 rounded-lg px-3 py-2 border border-gray-200">
-              Smart Construction & Remodeling
+              Smart Construction & Remodeling Inc.
             </div>
           </div>
           <div>
@@ -204,6 +306,18 @@ export default function AdminPage() {
                 <Badge color={member.status === "active" ? "#10b981" : "#94a3b8"} sm>
                   {member.status}
                 </Badge>
+                <span className="text-xs text-gray-400 hidden sm:inline" title="Sections with access">
+                  {countEnabled(member)}/{allSectionIds.length}
+                </span>
+                {hasPermAccess && (
+                  <button
+                    onClick={() => openPermissions(i)}
+                    className="p-1 text-gray-400 hover:text-indigo-500 transition"
+                    title="Manage permissions"
+                  >
+                    <Lock className="w-3.5 h-3.5" />
+                  </button>
+                )}
                 <button
                   onClick={() => { setEditForm({ name: member.name, email: member.email, role: member.role }); setEditIndex(i); setEditOpen(true); }}
                   className="p-1 text-gray-400 hover:text-blue-500 transition"
@@ -221,6 +335,18 @@ export default function AdminPage() {
               </div>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* Access Control Info Banner */}
+      <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-4 flex items-start gap-3">
+        <Shield className="w-5 h-5 text-indigo-500 mt-0.5 flex-shrink-0" />
+        <div>
+          <div className="text-sm font-semibold text-indigo-900">Role-Based Access Control</div>
+          <p className="text-xs text-indigo-700 mt-1">
+            Only <strong>Owner</strong> and <strong>Office Manager</strong> can manage team member permissions. 
+            Click the <Lock className="w-3 h-3 inline" /> icon next to any team member to configure which platform sections they can access.
+          </p>
         </div>
       </div>
 
@@ -264,7 +390,7 @@ export default function AdminPage() {
               const data = {
                 exportDate: new Date().toISOString(),
                 company: "Smart Construction & Remodeling Inc.",
-                team: teamMembers.map((m) => ({ name: m.name, email: m.email, role: m.role })),
+                team: teamMembers.map((m) => ({ name: m.name, email: m.email, role: m.role, permissions: m.permissions })),
                 preferences: prefs.map((p) => ({ label: p.label, enabled: p.enabled })),
               };
               const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
@@ -288,6 +414,8 @@ export default function AdminPage() {
           </div>
         </div>
       </div>
+
+      {/* ════════════ MODALS ════════════ */}
 
       {/* Invite Member Modal */}
       <Modal open={inviteOpen} onClose={() => setInviteOpen(false)} title="Invite Team Member">
@@ -368,6 +496,90 @@ export default function AdminPage() {
             <Btn color="#94a3b8" variant="outline" onClick={() => setRemoveOpen(false)}>Cancel</Btn>
             <Btn color="#ef4444" onClick={handleRemove}>Remove</Btn>
           </div>
+        </div>
+      </Modal>
+
+      {/* ════════════ PERMISSIONS MODAL ════════════ */}
+      <Modal open={permOpen} onClose={() => setPermOpen(false)} title={`Permissions — ${permIndex !== null ? teamMembers[permIndex]?.name : ""}`}>
+        <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
+          {/* Info banner */}
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-start gap-2">
+            <Shield className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
+            <p className="text-xs text-amber-800">
+              Toggle which platform sections this team member can access. Dashboard is always available.
+              {permIndex !== null && canManagePermissions(teamMembers[permIndex].role) && (
+                <span className="block mt-1 font-semibold">⚠ This user is an {teamMembers[permIndex].role} and has full admin rights by default.</span>
+              )}
+            </p>
+          </div>
+
+          {/* Quick actions */}
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                const all: Record<string, boolean> = {};
+                allSectionIds.forEach((id) => { all[id] = true; });
+                setPermDraft(all);
+              }}
+              className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1"
+            >
+              <Eye className="w-3 h-3" /> Grant All
+            </button>
+            <span className="text-gray-300">|</span>
+            <button
+              onClick={() => {
+                const none: Record<string, boolean> = {};
+                allSectionIds.forEach((id) => { none[id] = false; });
+                setPermDraft(none);
+              }}
+              className="text-xs text-red-600 hover:text-red-800 flex items-center gap-1"
+            >
+              <EyeOff className="w-3 h-3" /> Revoke All
+            </button>
+          </div>
+
+          {/* Section groups */}
+          {platformSections.map((group) => {
+            const expanded = expandedGroups[group.group] ?? false;
+            const enabledCount = group.items.filter((item) => permDraft[item.id]).length;
+            const allEnabled = enabledCount === group.items.length;
+            return (
+              <div key={group.group} className="border border-gray-200 rounded-lg overflow-hidden">
+                <div
+                  className="flex items-center justify-between px-3 py-2 bg-gray-50 cursor-pointer hover:bg-gray-100 transition"
+                  onClick={() => setExpandedGroups((prev) => ({ ...prev, [group.group]: !expanded }))}
+                >
+                  <div className="flex items-center gap-2">
+                    {expanded ? <ChevronUp className="w-3.5 h-3.5 text-gray-400" /> : <ChevronDown className="w-3.5 h-3.5 text-gray-400" />}
+                    <span className="text-xs font-bold text-gray-700 uppercase tracking-wide">{group.group}</span>
+                    <span className="text-xs text-gray-400">{enabledCount}/{group.items.length}</span>
+                  </div>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); toggleGroupAll(group); }}
+                    className={`text-xs px-2 py-0.5 rounded ${allEnabled ? "bg-green-100 text-green-700" : "bg-gray-200 text-gray-600"} hover:opacity-80 transition`}
+                  >
+                    {allEnabled ? "All On" : "Toggle All"}
+                  </button>
+                </div>
+                {expanded && (
+                  <div className="divide-y divide-gray-100">
+                    {group.items.map((item) => (
+                      <div key={item.id} className="flex items-center justify-between px-4 py-2">
+                        <span className="text-sm text-gray-700">{item.label}</span>
+                        <Toggle enabled={!!permDraft[item.id]} onToggle={() => togglePermission(item.id)} />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        <div className="flex justify-end gap-2 pt-4 border-t border-gray-100 mt-3">
+          <Btn color="#94a3b8" variant="outline" onClick={() => setPermOpen(false)}>Cancel</Btn>
+          <Btn color="#3b82f6" onClick={savePermissions}>
+            <span className="flex items-center gap-1.5"><Shield className="w-3.5 h-3.5" /> Save Permissions</span>
+          </Btn>
         </div>
       </Modal>
     </div>
