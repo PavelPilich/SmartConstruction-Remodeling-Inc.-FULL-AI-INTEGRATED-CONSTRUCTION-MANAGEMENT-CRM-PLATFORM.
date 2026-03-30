@@ -348,10 +348,10 @@ export default function RooflePage() {
               key={tier}
               className={`relative bg-white rounded-2xl border-2 transition-all cursor-pointer hover:shadow-lg ${
                 selected ? "border-blue-500 shadow-lg shadow-blue-500/20 scale-[1.02]" : "border-gray-200 hover:border-gray-300"
-              } ${pkg.popular ? "ring-2 ring-blue-500/30" : ""}`}
+              } ${"popular" in pkg && pkg.popular ? "ring-2 ring-blue-500/30" : ""}`}
               onClick={() => setSelectedPackage(tier)}
             >
-              {pkg.popular && (
+              {"popular" in pkg && pkg.popular && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                   <Badge color="#3b82f6">MOST POPULAR</Badge>
                 </div>

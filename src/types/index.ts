@@ -12,6 +12,8 @@ export type LineItem = {
   total: number;
 };
 
+export type EstimateStatus = "draft" | "pending" | "approved" | "submitted";
+
 export type Estimate = {
   id: string;
   project: string;
@@ -24,7 +26,7 @@ export type Estimate = {
     adjPhone: string;
     deductible: number;
   };
-  status: string;
+  status: EstimateStatus;
   dateCreated: string;
   dateApproved: string | null;
   totalRCV: number;
@@ -35,8 +37,10 @@ export type Estimate = {
   lines: LineItem[];
 };
 
+export type XactCategoryCode = "RFG" | "SDG" | "WDW" | "GTR" | "INT" | "PNT" | "DRY" | "PLM" | "ELC" | "GEN";
+
 export type XactCategory = {
-  code: string;
+  code: XactCategoryCode;
   name: string;
   color: string;
 };
@@ -46,8 +50,10 @@ export type PriceItem = {
   desc: string;
   unit: string;
   price: number;
-  cat: string;
+  cat: XactCategoryCode;
 };
+
+export type SupplementStatus = "approved" | "submitted" | "pending" | "denied";
 
 export type Supplement = {
   id: string;
@@ -56,7 +62,7 @@ export type Supplement = {
   reason: string;
   addedItems: number;
   addedAmount: number;
-  status: string;
+  status: SupplementStatus;
 };
 
 export type NavItem = {

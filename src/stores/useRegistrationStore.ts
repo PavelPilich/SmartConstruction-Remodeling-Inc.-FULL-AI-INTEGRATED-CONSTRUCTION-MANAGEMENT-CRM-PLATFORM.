@@ -23,7 +23,7 @@ interface RegistrationState {
 
   /* Compliance checking */
   checkExpiredDocs: () => string[];  // returns list of auto-blocked registrant IDs
-  unblockRegistrant: (id: string) => void;
+  unblockRegistrant: (id: string) => boolean;  // returns false if still has expired docs
 }
 
 export const useRegistrationStore = create<RegistrationState>((set, get) => ({
@@ -89,14 +89,10 @@ export const useRegistrationStore = create<RegistrationState>((set, get) => ({
     const now = new Date();
     const blockedIds: string[] = [];
 
-    set((s) => ({
-      registrants: s.registrants.map((reg) => {
+    set((s) => {
+      const updated = s.registrants.map((reg) => {
         const pos = s.positions.find((p) => p.id === reg.positionId);
         if (!pos) return reg;
-
-        const expiredDocs = reg.documents.filter(
-          (d) => d.expirationDate && new Date(d.expirationDate) < now && d.status !== "expired"
-        );
 
         // Mark expired docs
         const updatedDocs = reg.documents.map((d) => {
@@ -125,15 +121,32 @@ export const useRegistrationStore = create<RegistrationState>((set, get) => ({
         }
 
         return { ...reg, documents: updatedDocs };
-      }),
-    }));
+      });
+
+      return { registrants: updated };
+    });
 
     return blockedIds;
   },
 
-  unblockRegistrant: (id) => set((s) => ({
-    registrants: s.registrants.map((r) =>
-      r.id === id ? { ...r, status: "active", blockedReason: null } : r
-    ),
-  })),
+  unblockRegistrant: (id) => {
+    const state = get();
+    const reg = state.registrants.find((r) => r.id === id);
+    if (!reg) return false;
+
+    // Guard: don't unblock if there are still expired docs
+    const now = new Date();
+    const hasExpiredDocs = reg.documents.some(
+      (d) => d.status === "expired" || (d.expirationDate && new Date(d.expirationDate) < now)
+    );
+
+    if (hasExpiredDocs) return false;
+
+    set((s) => ({
+      registrants: s.registrants.map((r) =>
+        r.id === id ? { ...r, status: "active" as const, blockedReason: null } : r
+      ),
+    }));
+    return true;
+  },
 }));
