@@ -143,6 +143,7 @@ const navSections = [
       { id: "integration", label: "Integrations", icon: Link2, path: "/settings/integrations" },
       { id: "admin", label: "Admin", icon: Settings, path: "/settings/admin" },
       { id: "backup", label: "Backup & Data", icon: HardDrive, path: "/settings/backup" },
+      { id: "audit", label: "Production Audit", icon: ShieldCheck, path: "/settings/audit" },
     ],
   },
 ];

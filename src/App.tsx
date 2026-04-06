@@ -51,6 +51,7 @@ import SubTimesheetsPage from "./pages/subportal/SubTimesheetsPage";
 import SubPaymentsPage from "./pages/subportal/SubPaymentsPage";
 import AiToolsPage from "./pages/ai/AiToolsPage";
 import BackupPage from "./pages/settings/BackupPage";
+import ProductionAuditPage from "./pages/settings/ProductionAuditPage";
 import NotFoundPage from "./pages/NotFoundPage";
 
 /* ── Lazy-loaded heavy pages (code splitting) ── */
@@ -104,6 +105,7 @@ function AdminLayout() {
               <Route path="/settings/integrations" element={<IntegrationPage />} />
               <Route path="/settings/admin" element={<AdminPage />} />
               <Route path="/settings/backup" element={<BackupPage />} />
+              <Route path="/settings/audit" element={<ProductionAuditPage />} />
               <Route path="/admin/registrations" element={<RegistrationsListPage />} />
               <Route path="/admin/registrations/:id" element={<RegistrantDetailPage />} />
               <Route path="/admin/positions" element={<PositionManagerPage />} />
